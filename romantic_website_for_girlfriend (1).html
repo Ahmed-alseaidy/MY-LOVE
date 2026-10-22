@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إلى هاجر.. My Soul ❤️</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Cairo, Amiri & Playfair Display -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Playfair+Display:ital,wght@1,600;1,700&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        softpink: {
+                            50: '#fff5f7',
+                            100: '#ffe3eb',
+                            200: '#fcc2d1',
+                            300: '#f89db8',
+                            400: '#f06595',
+                            500: '#e64980',
+                        },
+                        cream: {
+                            50: '#fdfbf7',
+                            100: '#f7f2ea',
+                            200: '#ece3d3',
+                        },
+                        warmgold: {
+                            300: '#e6ca65',
+                            400: '#d4af37',
+                            500: '#c59b27',
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        amiri: ['Amiri', 'serif'],
+                        serifTitle: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #fffafc 0%, #fff0f5 50%, #fef7f2 100%);
+            min-height: 100vh;
+            color: #4a3b40;
+        }
+
+        /* Subtle Soft Glassmorphism Card */
+        .light-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(252, 194, 209, 0.45);
+            box-shadow: 0 10px 25px -5px rgba(240, 101, 149, 0.06), 0 4px 10px -2px rgba(0, 0, 0, 0.02);
+        }
+
+        /* Interactive Card Hover Animation */
+        .reason-card {
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reason-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(240, 101, 149, 0.12);
+            border-color: rgba(248, 157, 184, 0.8);
+        }
+
+        /* Background Particle Canvas */
+        #hearts-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="relative text-stone-700 flex flex-col justify-between selection:bg-softpink-200 selection:text-softpink-500">
+
+    <!-- Soft Floating Hearts Particles Canvas -->
+    <canvas id="hearts-canvas"></canvas>
+
+    <!-- Ambient Music Toggle Button -->
+    <button id="music-btn" onclick="toggleMusic()" class="fixed top-4 left-4 z-50 bg-white/85 hover:bg-white text-softpink-400 p-3 rounded-full shadow-sm border border-softpink-200 transition-all duration-300 flex items-center gap-2 backdrop-blur-md text-xs font-semibold">
+        <i id="music-icon" class="fas fa-heart text-sm animate-pulse text-softpink-300"></i>
+        <span id="music-text" class="hidden sm:inline text-stone-600">تشغيل الموسيقى</span>
+    </button>
+
+    <!-- ==================== LOCK SCREEN ==================== -->
+    <div id="lock-screen" class="fixed inset-0 z-40 flex items-center justify-center p-4 transition-opacity duration-500 bg-softpink-50/90 backdrop-blur-md">
+        <div class="light-card max-w-sm w-full p-8 rounded-3xl text-center relative shadow-xl border border-softpink-200">
+            
+            <div class="w-16 h-16 mx-auto mb-4 bg-softpink-100 rounded-full flex items-center justify-center text-softpink-400 text-2xl shadow-inner">
+                <i class="fas fa-heart"></i>
+            </div>
+
+            <h1 class="text-2xl font-bold text-stone-800 mb-1">خاص بـ هاجر ❤️</h1>
+            <p class="text-xs text-softpink-400 font-serifTitle italic tracking-wider mb-5">My Soul Only</p>
+
+            <form onsubmit="unlockSite(event)" class="space-y-4">
+                <div class="relative">
+                    <input type="password" id="pass-input" placeholder="اكتبي كلمة السر هنا..." 
+                        class="w-full px-4 py-3 bg-white/90 border border-softpink-200 rounded-2xl text-center text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:border-softpink-400 focus:ring-2 focus:ring-softpink-100 transition">
+                </div>
+
+                <div id="lock-error" class="text-rose-500 text-xs hidden">
+                    كلمة السر مش صحيحة، جربي اسمك يا هاجر! 💕
+                </div>
+
+                <div class="text-[11px] text-stone-500 bg-softpink-50/80 py-2.5 px-3 rounded-xl border border-softpink-100 leading-relaxed">
+                    💡 <span class="font-semibold text-softpink-400">تلميح:</span> اضغطي على أي كلمة لتجربتها: 
+                    <span class="underline cursor-pointer font-bold text-softpink-400 mx-0.5" onclick="quickFill('هاجر')">هاجر</span> | 
+                    <span class="underline cursor-pointer font-bold text-softpink-400 mx-0.5" onclick="quickFill('my soul')">my soul</span> | 
+                    <span class="underline cursor-pointer font-bold text-softpink-400 mx-0.5" onclick="quickFill('بحبك')">بحبك</span>
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-softpink-300 to-softpink-400 hover:from-softpink-400 hover:to-softpink-500 text-white font-bold rounded-2xl shadow-md transition transform active:scale-95 text-sm">
+                    افتحي المكان الخاص بينا ✨
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MAIN UNLOCKED CONTENT ==================== -->
+    <main id="main-content" class="hidden relative z-10 max-w-2xl mx-auto px-4 py-12 space-y-10">
+        
+        <!-- Header Section -->
+        <section class="text-center space-y-3 pt-4">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-softpink-100/80 border border-softpink-200 text-softpink-400 text-xs font-semibold">
+                <i class="fas fa-sparkles text-warmgold-400"></i>
+                <span>عالمنا البسيط والهادي</span>
+            </div>
+
+            <h1 class="text-4xl md:text-5xl font-black text-stone-800 tracking-tight">
+                هاجر
+            </h1>
+            <div class="text-2xl md:text-3xl font-serifTitle italic text-softpink-400 font-bold">
+                ~ My Soul ❤️ ~
+            </div>
+            <p class="text-stone-500 max-w-md mx-auto pt-1 font-amiri text-base md:text-lg leading-relaxed">
+                عملتلك المكان ده بروقان وبساطة من غير أي زحمة، عشان يفضل كلامي الشفاف والصافي ليكي هو الأوضح دايماً.
+            </p>
+        </section>
+
+        <!-- Sweet Warm Letter Section -->
+        <section class="light-card rounded-3xl p-6 md:p-8 space-y-4 relative overflow-hidden border border-softpink-200 shadow-sm">
+            <div class="flex items-center gap-3 border-b border-softpink-100 pb-3.5">
+                <div class="w-10 h-10 rounded-full bg-softpink-100 flex items-center justify-center text-softpink-400 text-base">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-stone-800">جواب لـ روح قلبي</h2>
+                    <p class="text-xs text-softpink-400 font-serifTitle italic">To Hajar</p>
+                </div>
+            </div>
+
+            <div class="space-y-3.5 text-stone-600 text-base md:text-lg leading-relaxed font-amiri">
+                <p>
+                    حبيبتي هاجر..
+                </p>
+                <p>
+                    لما سميتك <strong class="text-softpink-400 font-cairo">"My Soul"</strong> مكنتش كلمة حاسسها ومكتوبة وخلاص، دي كانت الحقيقة الوحيدة اللي بلمسها كل يوم معاكي. روحك بتهوّن عليا الدنيا، ووجودك في حياتي مخلّي لكل حاجة طعم أحلى وأهدى.
+                </p>
+                <p>
+                    أنتِ مش بس خطيبتي وحبيبتي، أنتِ السكن والأمان والضحكة الصافية اللي بدعي ربنا تفضل منورة دنيتي طول العمر.
+                </p>
+                <p class="text-softpink-400 font-bold font-cairo text-sm pt-1">
+                    بحبك جداً وبكل بساطة يا هاجر ❤️
+                </p>
+            </div>
+        </section>
+
+        <!-- Interactive Reasons Cards Grid -->
+        <section class="space-y-5">
+            <div class="text-center">
+                <h2 class="text-xl md:text-2xl font-bold text-stone-800">ليه أنتِ بجد My Soul؟ ✨</h2>
+                <p class="text-xs text-stone-400 mt-1">(اضغطي على أي كارت عشان تشوفي السر 🌸)</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                <!-- Reason 1: Fun / Sense of Humor -->
+                <div onclick="revealNote(this, 'ضحكتك ودمك الخفيف بيهونوا عليا أي يوم صعب، وبمجرد ما بتضحكي الدنيا كلها بتضحكلي معاكي.')" 
+                    class="reason-card light-card p-5 rounded-2xl cursor-pointer text-center border border-softpink-100">
+                    <div class="w-11 h-11 mx-auto mb-3 rounded-full bg-softpink-100/70 flex items-center justify-center text-softpink-400 text-lg">
+                        <i class="fas fa-face-smile-beam"></i>
+                    </div>
+                    <h3 class="font-bold text-stone-800 text-sm md:text-base">دمك الخفيف وضحكتك</h3>
+                    <p class="card-text text-xs text-stone-400 mt-1">اضغطي هنا 🌸</p>
+                </div>
+
+                <!-- Reason 2: Being Natural / Natural Self -->
+                <div onclick="revealNote(this, 'معاكي بكون أنا بكل بساطة.. من غير تصنع ولا تحسين صورة ولا تمثيل، بكون مرتاح ومبسوط على طبيعتي.')" 
+                    class="reason-card light-card p-5 rounded-2xl cursor-pointer text-center border border-softpink-100">
+                    <div class="w-11 h-11 mx-auto mb-3 rounded-full bg-softpink-100/70 flex items-center justify-center text-softpink-400 text-lg">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3 class="font-bold text-stone-800 text-sm md:text-base">معاكي على طبيعتي</h3>
+                    <p class="card-text text-xs text-stone-400 mt-1">اضغطي هنا 🌸</p>
+                </div>
+
+                <!-- Reason 3: Unpretentious & Genuine -->
+                <div onclick="revealNote(this, 'أجمل حاجة فيكي إنك طبيعية ومش متصنعة.. كل تصرف وطيبة طالعين من قلبك حقيقيين وصافيين.')" 
+                    class="reason-card light-card p-5 rounded-2xl cursor-pointer text-center border border-softpink-100">
+                    <div class="w-11 h-11 mx-auto mb-3 rounded-full bg-softpink-100/70 flex items-center justify-center text-softpink-400 text-lg">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <h3 class="font-bold text-stone-800 text-sm md:text-base">طبيعية وبسيطة وحقيقية</h3>
+                    <p class="card-text text-xs text-stone-400 mt-1">اضغطي هنا 🌸</p>
+                </div>
+
+                <!-- Reason 4: Comfort and Safety -->
+                <div onclick="revealNote(this, 'أنتِ الأمان والبيت الدافي اللي برتاح فيه من زحمة العالم، ومعاكي وبس بحس بالسكون.')" 
+                    class="reason-card light-card p-5 rounded-2xl cursor-pointer text-center border border-softpink-100">
+                    <div class="w-11 h-11 mx-auto mb-3 rounded-full bg-softpink-100/70 flex items-center justify-center text-softpink-400 text-lg">
+                        <i class="fas fa-shield-heart"></i>
+                    </div>
+                    <h3 class="font-bold text-stone-800 text-sm md:text-base">سكني وأماني</h3>
+                    <p class="card-text text-xs text-stone-400 mt-1">اضغطي هنا 🌸</p>
+                </div>
+
+                <!-- Reason 5: Unique Soul (Full Width on SM) -->
+                <div onclick="revealNote(this, 'لإن روحك ملهاش بديل.. أنتِ البنت الوحيدة اللي خطفت قلبي وبقت كل حاجة بالنسبة ليا.')" 
+                    class="reason-card light-card p-5 rounded-2xl cursor-pointer text-center border border-softpink-100 sm:col-span-2">
+                    <div class="w-11 h-11 mx-auto mb-3 rounded-full bg-softpink-100/70 flex items-center justify-center text-softpink-400 text-lg">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                    </div>
+                    <h3 class="font-bold text-stone-800 text-sm md:text-base">روح مش بتتكرر تاني</h3>
+                    <p class="card-text text-xs text-stone-400 mt-1">اضغطي هنا 🌸</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Dynamic Cute Surprise Section -->
+        <section class="text-center py-2">
+            <div class="light-card p-7 md:p-8 rounded-3xl border border-softpink-200 max-w-md mx-auto space-y-4 shadow-sm">
+                <h3 class="text-lg font-bold text-stone-800">عايزة تعرفي بحبك قد إيه دلوقتي؟</h3>
+                
+                <button onclick="popLoveNote()" class="w-full py-3.5 px-6 bg-gradient-to-r from-softpink-300 via-softpink-400 to-softpink-300 hover:from-softpink-400 hover:to-softpink-500 text-white font-bold rounded-2xl shadow-md transition transform active:scale-95 flex items-center justify-center gap-2 text-sm">
+                    <i class="fas fa-heart text-white animate-pulse"></i>
+                    <span>تغطي هنا يا هاجر ✨</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-stone-400 pt-6 pb-2">
+            <p>صُنِع بكل بساطة وحب لـ <span class="text-softpink-400 font-bold">هاجر (My Soul)</span> ❤️</p>
+        </footer>
+
+    </main>
+
+    <!-- Modal Pop-Up Love Note -->
+    <div id="love-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/30 backdrop-blur-sm hidden transition-opacity duration-300">
+        <div class="light-card max-w-sm w-full p-6 rounded-3xl text-center border border-softpink-200 shadow-2xl relative bg-white">
+            <button onclick="closeLoveModal()" class="absolute top-4 left-4 text-stone-400 hover:text-stone-600 text-base">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="w-12 h-12 mx-auto mb-3 bg-softpink-100 rounded-full flex items-center justify-center text-softpink-400 text-xl">
+                <i class="fas fa-heart"></i>
+            </div>
+            <h3 class="text-lg font-bold text-stone-800 mb-2">رسالة مفاجأة لـ هاجر 💕</h3>
+            <p id="modal-note-text" class="text-stone-600 text-sm leading-relaxed mb-5 font-amiri text-base md:text-lg">
+                --
+            </p>
+            <button onclick="closeLoveModal()" class="w-full py-2.5 bg-softpink-400 text-white font-bold rounded-xl text-xs hover:bg-softpink-500 transition">
+                بحبك يا My Soul ❤️
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const validPasses = ['هاجر', 'hajar', 'my soul', 'بحبك', 'روحي'];
+
+        const dynamicLoveNotes = [
+            "بحبك بعدد كل نقط المطر وعدد القلوب اللي بتنبط بحبك يا هاجر! 🌧️✨",
+            "أنتِ مش بس حبيبتي، أنتِ ضحكتي وروحي وعوض ربنا الجميل ليا ❤️",
+            "ببساطة كده وبكل وضوح: الدنيا من غيرك ملهاش أي طعم يا My Soul 🌸",
+            "كل ثانية وإنتِ الحقيقة الحلوة في حياتي، وربنا يخليكي ليا طول العمر ✨",
+            "دمك الخفيف وطبيعتك البسيطة هما أكتر حاجتين بيخلوني أعشقك كل يوم زيادة! 💕"
+        ];
+
+        let audioContext = null;
+        let isPlaying = false;
+
+        function quickFill(val) {
+            document.getElementById('pass-input').value = val;
+        }
+
+        function unlockSite(e) {
+            e.preventDefault();
+            const val = document.getElementById('pass-input').value.trim().toLowerCase();
+            if (validPasses.includes(val)) {
+                const lock = document.getElementById('lock-screen');
+                const main = document.getElementById('main-content');
+                lock.classList.add('opacity-0');
+                setTimeout(() => {
+                    lock.classList.add('hidden');
+                    main.classList.remove('hidden');
+                    confetti({
+                        particleCount: 50,
+                        spread: 60,
+                        origin: { y: 0.6 },
+                        colors: ['#f89db8', '#fcc2d1', '#e6ca65']
+                    });
+                }, 500);
+            } else {
+                document.getElementById('lock-error').classList.remove('hidden');
+            }
+        }
+
+        function revealNote(element, text) {
+            const textEl = element.querySelector('.card-text');
+            textEl.innerText = text;
+            textEl.classList.remove('text-stone-400');
+            textEl.classList.add('text-softpink-500', 'font-medium', 'pt-1', 'font-amiri', 'text-sm');
+        }
+
+        function popLoveNote() {
+            const randomMsg = dynamicLoveNotes[Math.floor(Math.random() * dynamicLoveNotes.length)];
+            document.getElementById('modal-note-text').innerText = randomMsg;
+            document.getElementById('love-modal').classList.remove('hidden');
+
+            confetti({
+                particleCount: 45,
+                spread: 70,
+                origin: { y: 0.5 },
+                colors: ['#f89db8', '#fcc2d1']
+            });
+        }
+
+        function closeLoveModal() {
+            document.getElementById('love-modal').classList.add('hidden');
+        }
+
+        // Soft Synthesized Ambient Music (Calming Pure Tones)
+        function toggleMusic() {
+    const music = document.getElementById('bgMusic');
+    const icon = document.getElementById('music-icon');
+    const text = document.getElementById('music-text');
+
+    if (music.paused) {
+        music.play();
+        icon.classList.remove('fa-heart');
+        icon.classList.add('fa-pause');
+        text.innerText = "إيقاف الموسيقى";
+    } else {
+        music.pause();
+        icon.classList.remove('fa-pause');
+        icon.classList.add('fa-heart');
+        text.innerText = "تشغيل الموسيقى";
+    }
+}
+
+        function playSoftMelody() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            } else {
+                audioContext.resume();
+                return;
+            }
+
+            const notes = [261.63, 329.63, 392.00, 523.25]; // Soft Melody C-E-G-C
+            let idx = 0;
+
+            setInterval(() => {
+                if (!isPlaying || audioContext.state !== 'running') return;
+
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(notes[idx % notes.length], audioContext.currentTime);
+
+                gain.gain.setValueAtTime(0.005, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.035, audioContext.currentTime + 0.8);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 2.5);
+
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+
+                osc.start();
+                osc.stop(audioContext.currentTime + 2.6);
+
+                idx++;
+            }, 1800);
+        }
+
+        // Floating Particles Canvas Effect
+        const canvas = document.getElementById('hearts-canvas');
+        const ctx = canvas.getContext('2d');
+        let hearts = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class SoftParticle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 7 + 2;
+                this.speedY = Math.random() * 0.35 + 0.1;
+                this.opacity = Math.random() * 0.35 + 0.1;
+            }
+
+            update() {
+                this.y -= this.speedY;
+                if (this.y < -10) {
+                    this.y = canvas.height + 10;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(248, 157, 184, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            hearts = [];
+            for (let i = 0; i < 20; i++) {
+                hearts.push(new SoftParticle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < hearts.length; i++) {
+                hearts[i].update();
+                hearts[i].draw();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.onload = function() {
+            initParticles();
+            animateParticles();
+        };
+    </script>
+    <audio id="bgMusic" loop src="LOVE.mp3"></audio>
+</body>
+</html>
